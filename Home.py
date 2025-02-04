@@ -5,6 +5,7 @@ from datetime import datetime
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import plotly.express as px
 
 # Load environment variables
 load_dotenv()
@@ -126,8 +127,61 @@ try:
         # Process only selected number of rows
         df_subset = df.head(num_rows).copy()
         df_subset['Category'] = df_subset.apply(lambda x: classify_procurement(x['Title'], x['Description']), axis=1)
-        st.subheader("Procurement Categories")
-        st.dataframe(df_subset[['Title', 'Description', 'Category', 'Creator', 'Published']])
+        
+        # Store the processed dataframe in session state
+        st.session_state['processed_df'] = df_subset
+        
+        # Default categories for filter
+        default_categories = [
+            'Professional Services',
+            'Technology & IT',
+            'Healthcare & Medical',
+            'Other'  # Added Other category
+        ]
+        
+        # Get unique categories for multiselect
+        all_categories = sorted(df_subset['Category'].unique().tolist())
+        
+        # Create multiselect filter
+        selected_categories = st.multiselect(
+            "Filter by Categories:",
+            options=all_categories,
+            default=default_categories,
+            help="Select one or more categories to filter the results"
+        )
+        
+        # Filter dataframe based on selection
+        if selected_categories:
+            filtered_df = df_subset[df_subset['Category'].isin(selected_categories)]
+        else:
+            filtered_df = df_subset
+        
+        # Display filtered dataframe
+        st.subheader("Filtered Procurement Categories")
+        st.dataframe(filtered_df[['Title', 'Description', 'Category', 'Creator', 'Published']])
+        
+        # Create category distribution chart
+        category_counts = df_subset['Category'].value_counts().reset_index()
+        category_counts.columns = ['Category', 'Count']
+        
+        fig = px.bar(
+            category_counts,
+            x='Category',
+            y='Count',
+            title='Distribution of Procurements by Category',
+            labels={'Count': 'Number of Procurements', 'Category': 'Procurement Category'},
+            color='Category'
+        )
+        
+        # Customize layout
+        fig.update_layout(
+            xaxis_tickangle=-45,
+            showlegend=False,
+            height=500
+        )
+        
+        # Display chart
+        st.plotly_chart(fig, use_container_width=True)
 
 except Exception as e:
     st.error(f"Error fetching or processing the feed: {str(e)}")
