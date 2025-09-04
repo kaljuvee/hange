@@ -207,7 +207,10 @@ export default function Home() {
               <a href="#testimonials" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
                 {language === 'et' ? 'Arvustused' : 'Testimonials'}
               </a>
-              <button className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium">
+              <button 
+                onClick={() => window.open('https://hange.onrender.com/', '_blank')}
+                className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium"
+              >
                 {language === 'et' ? 'Logi sisse' : 'Sign In'}
               </button>
             </nav>
