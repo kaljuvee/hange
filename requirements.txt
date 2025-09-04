@@ -6,7 +6,6 @@ openai
 plotly
 beautifulsoup4
 requests
-sqlite3
 python-docx
 openpyxl
 fpdf2
