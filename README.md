@@ -153,25 +153,25 @@ The landing page will be available at `http://localhost:3000`
 
 1. **Build the application**:
    ```bash
-   cd ui/web-ui
+   cd web-ui
    npm install
    npm run build
    ```
 
 2. **Deploy to Netlify**:
    - Visit netlify.com
-   - Drag and drop the `ui/web-ui/out` folder (after running `npm run build`)
+   - Drag and drop the `web-ui/out` folder (after running `npm run build`)
    - **Or connect your GitHub repository**:
-     - Set **Base directory** to `ui/web-ui`
+     - Set **Base directory** to `web-ui`
      - Set **Build command** to `npm run build`
-     - Set **Publish directory** to `ui/web-ui/out`
+     - Set **Publish directory** to `web-ui/out`
 
 ##### Option 3: Render.com (Static Site)
 
 ```bash
 # Connect GitHub repository
 # Service type: Static Site
-# Root Directory: ui/web-ui
+# Root Directory: web-ui
 # Build command: npm run build
 # Publish directory: out
 ```
@@ -230,9 +230,11 @@ hange/
 │   ├── sample_procurement_data.json
 │   ├── extracted_fields_sample.csv
 │   └── enhanced_test_results_*.json
-├── 📁 ui/                     # Frontend components
-│   ├── hange-landing/         # React + Vite (current)
-│   └── hange-nextjs/          # Next.js (recommended)
+├── 📁 web-ui/                 # Next.js Landing Page (Production Ready)
+│   ├── src/app/               # Next.js app directory
+│   ├── public/                # Static assets
+│   ├── package.json           # Node.js dependencies
+│   └── DEPLOYMENT_INSTRUCTIONS.md # Deployment guide
 ├── 📄 Home.py                 # Main Streamlit application
 ├── 📄 enhanced_document_processor.py # AI document processing
 ├── 📄 requirements.txt        # Python dependencies

@@ -7,10 +7,8 @@ import {
   FileText, 
   Mail, 
   BarChart3, 
-  CheckCircle, 
   Star,
   ArrowRight,
-  Globe,
   Award,
   Zap,
   Shield,
@@ -336,7 +334,7 @@ export default function Home() {
                     <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-700 mb-8 italic leading-relaxed text-lg">"{testimonial.text}"</p>
+                <p className="text-gray-700 mb-8 italic leading-relaxed text-lg">&ldquo;{testimonial.text}&rdquo;</p>
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
                     {testimonial.name.charAt(0)}
