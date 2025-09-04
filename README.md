@@ -115,121 +115,65 @@ docker build -t hange-ai .
 docker run -p 8501:8501 -e OPENAI_API_KEY=your_key hange-ai
 ```
 
-### 2. UI Components (Landing Page)
+### 2. Next.js Landing Page (UI)
 
-The UI folder contains two implementations:
+**Framework**: Next.js 15 + TypeScript + Tailwind CSS  
+**Location**: `ui/web-ui/`
 
-#### Current: React + Vite (`ui/hange-landing/`)
+#### Local Development
 
-**Framework**: React 18 + Vite + Tailwind CSS + shadcn/ui
-
-**Local Development**:
 ```bash
-cd ui/hange-landing
+# Navigate to UI directory
+cd ui/web-ui
 
 # Install dependencies
 npm install
-# or
-pnpm install
 
 # Start development server
 npm run dev
-# or 
-pnpm dev
 ```
 
-**Production Build**:
-```bash
-# Build for production
-npm run build
-# or
-pnpm build
+The landing page will be available at `http://localhost:3000`
 
-# Preview production build
-npm run preview
-```
+#### Production Deployment
 
-**Deployment Options**:
+##### Option 1: Deploy to Vercel (Recommended)
 
-##### Netlify
-```bash
-# Build the project
-npm run build
+1. **Visit vercel.com**
+2. **Connect your GitHub account**
+3. **Import the repository**
+4. **Set the Root Directory to `ui/web-ui`**
+5. **Deploy automatically**
 
-# Deploy to Netlify (drag & drop dist/ folder)
-# Or connect GitHub repository with these settings:
-# Build command: npm run build
-# Publish directory: dist
-```
+**Custom Domain (Optional)**:
+- Add your custom domain in Vercel dashboard
+- Update DNS settings as instructed
 
-##### Vercel
-```bash
-# Install Vercel CLI
-npm install -g vercel
+##### Option 2: Deploy to Netlify
 
-# Deploy
-vercel --prod
+1. **Build the application**:
+   ```bash
+   cd ui/web-ui
+   npm install
+   npm run build
+   ```
 
-# Or connect GitHub repository at vercel.com
-# Framework: React
-# Build command: npm run build
-# Output directory: dist
-```
+2. **Deploy to Netlify**:
+   - Visit netlify.com
+   - Drag and drop the `ui/web-ui/out` folder (after running `npm run build`)
+   - **Or connect your GitHub repository**:
+     - Set **Base directory** to `ui/web-ui`
+     - Set **Build command** to `npm run build`
+     - Set **Publish directory** to `ui/web-ui/out`
 
-##### Render.com (Static Site)
+##### Option 3: Render.com (Static Site)
+
 ```bash
 # Connect GitHub repository
 # Service type: Static Site
+# Root Directory: ui/web-ui
 # Build command: npm run build
-# Publish directory: dist
-```
-
-#### Preferred: Next.js Implementation (Recommended)
-
-Since you prefer Next.js, here's how to create and deploy a Next.js version:
-
-**Create Next.js Version**:
-```bash
-cd ui
-
-# Create new Next.js app
-npx create-next-app@latest hange-nextjs --typescript --tailwind --eslint --app --src-dir
-
-cd hange-nextjs
-
-# Install additional dependencies for UI components
-npm install @radix-ui/react-slot class-variance-authority clsx tailwind-merge lucide-react
-
-# Start development
-npm run dev
-```
-
-**Next.js Deployment**:
-
-##### Vercel (Recommended for Next.js)
-```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Deploy
-vercel --prod
-
-# Or connect GitHub repository at vercel.com
-# Framework: Next.js (auto-detected)
-```
-
-##### Netlify
-```bash
-# Build command: npm run build
-# Publish directory: .next
-# Functions directory: netlify/functions
-```
-
-##### Render.com
-```bash
-# Build command: npm run build
-# Start command: npm start
-# Environment: Node.js
+# Publish directory: out
 ```
 
 ## 🔧 Configuration
