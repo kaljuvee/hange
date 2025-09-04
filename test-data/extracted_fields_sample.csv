@@ -1,0 +1,21 @@
+field_name,field_type,label,required,description,options,validation,confidence_score
+company_name,text,Ettevõtte nimi,true,Pakkuja ettevõtte ametlik nimi,,min_length:2,0.95
+registration_number,text,Registrikood,true,Ettevõtte registrikood Eesti formaadis,,pattern:^[0-9]{8}$,0.98
+vat_number,text,KMKR number,true,Käibemaksu registri number,,pattern:^EE[0-9]{9}$,0.92
+contact_person,text,Kontaktisik,true,Vastutava isiku nimi,,min_length:2,0.89
+email,email,E-posti aadress,true,Kehtiv e-posti aadress,,email_format,0.97
+phone,tel,Telefon,true,Telefoni number Eesti formaadis,,pattern:^\+372[0-9]{7,8}$,0.85
+project_description,textarea,Projekti kirjeldus,true,Detailne projekti kirjeldus (min 500 tähemärki),,min_length:500,0.91
+technology_stack,text,Tehnoloogiad,true,Kasutatavate tehnoloogiate loetelu,,min_length:10,0.88
+team_size,number,Meeskonna suurus,true,Projektile määratud töötajate arv,,min:1;max:100,0.93
+project_duration,number,Projekti kestus (kuud),true,Eeldatav projekti kestus kuudes,,min:1;max:36,0.90
+total_cost,number,Kogumaksumus (EUR),true,Projekti kogumaksumus eurodes,,min:1000,0.96
+payment_schedule,dropdown,Maksegraafik,true,Maksete tegemise graafik,"Kuine,Kvartaalne,Etapipõhine",,0.87
+warranty_period,number,Garantiiperiood (kuud),true,Pakutav garantiiperiood kuudes,,min:6;max:60,0.84
+iso_certified,checkbox,ISO 27001 sertifikaat,false,Kas ettevõte omab ISO 27001 sertifikaati,"Jah,Ei",,0.92
+gdpr_compliant,checkbox,GDPR vastavus,true,Kas lahendus vastab GDPR nõuetele,"Jah,Ei",,0.94
+estonian_support,checkbox,Eesti keele tugi,true,Kas lahendus toetab eesti keelt,"Jah,Ei",,0.89
+previous_experience,textarea,Varasem kogemus,true,Kirjeldage 3 sarnast projekti,,min_length:200,0.86
+certifications,text,Sertifikaadid,false,Asjakohased sertifikaadid ja tunnistused,,,0.82
+references,textarea,Soovitused,false,Kontaktandmed 3 soovitajast,,,0.80
+

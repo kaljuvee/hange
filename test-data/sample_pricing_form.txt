@@ -1,0 +1,20 @@
+
+    SHEET: Hinnapakkumise vorm
+    
+    HEADERS:
+    Kirjeldus | Ühik | Kogus | Ühiku hind (EUR) | Kokku (EUR)
+    
+    DATA SAMPLE:
+    Süsteemi analüüs | tund | 40 | 85.00 | 3400.00
+    Arendus | tund | 200 | 75.00 | 15000.00
+    Testimine | tund | 60 | 70.00 | 4200.00
+    Dokumentatsioon | tund | 30 | 65.00 | 1950.00
+    Koolitus | tund | 16 | 80.00 | 1280.00
+    
+    FORMULAS:
+    FORMULA in E2: =C2*D2
+    FORMULA in E7: =SUM(E2:E6)
+    
+    VALIDATION in D2: >0
+    VALIDATION in C2: >0
+    

@@ -1,0 +1,28 @@
+[
+  {
+    "test_name": "IT Procurement Document",
+    "document_type": "riigihange_it_teenuste_osutamine",
+    "confidence_score": 0.9,
+    "processing_time": 44.244694,
+    "fields_count": 19,
+    "requirements_count": 5,
+    "validation_errors": 1,
+    "success": true,
+    "cache_hit": false
+  },
+  {
+    "test_name": "Pricing Form Document",
+    "success": false,
+    "error": "Could not extract text from document"
+  },
+  {
+    "test_name": "Cache Performance",
+    "success": false,
+    "error": "enhanced_document_processor.DocumentAnalysis() got multiple values for keyword argument 'cache_hit'"
+  },
+  {
+    "test_name": "Form Preview Generation",
+    "success": false,
+    "error": "enhanced_document_processor.DocumentAnalysis() got multiple values for keyword argument 'cache_hit'"
+  }
+]

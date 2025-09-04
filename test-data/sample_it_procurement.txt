@@ -1,0 +1,41 @@
+
+    RIIGIHANGE - IT TEENUSTE OSUTAMINE
+    
+    1. ÜLDANDMED
+    Ettevõtte nimi: _______________
+    Registrikood: _______________
+    KMKR number: _______________
+    
+    2. KONTAKTANDMED
+    Kontaktisik: _______________
+    E-posti aadress: _______________
+    Telefon: _______________
+    Aadress: _______________
+    
+    3. PROJEKTI KIRJELDUS
+    Projekti kirjeldus (min 500 tähemärki): _______________
+    Kasutatavad tehnoloogiad: _______________
+    Meeskonna suurus: _______________
+    Projekti kestus (kuud): _______________
+    
+    4. FINANTSINFORMATSIOON
+    Kogumaksumus (EUR): _______________
+    Maksegraafik: [ ] Kuine [ ] Kvartaalne [ ] Etapipõhine
+    
+    5. KVALITEET JA VASTAVUS
+    [ ] ISO 27001 sertifikaat
+    [ ] GDPR vastavus
+    [ ] Eesti keele tugi
+    
+    6. KOGEMUS
+    Varasem kogemus (kirjeldage 3 sarnast projekti): _______________
+    Sertifikaadid: _______________
+    Soovitused: _______________
+    
+    NÕUDED:
+    - Vähemalt 5 aastat kogemust avaliku sektori IT projektides
+    - ISO 27001 sertifikaat kohustuslik
+    - GDPR vastavuse tagamine
+    - Eesti keele oskus
+    - 24/7 tehnilise toe olemasolu
+    

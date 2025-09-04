@@ -1,0 +1,82 @@
+[
+  {
+    "id": "9262944",
+    "title": "IT teenuste osutamine valitsusportaali arendamiseks",
+    "description": "Riigi Infosüsteemi Amet vajab IT teenuseid valitsusportaali moderniseerimiseks. Projekt hõlmab süsteemi arhitektuuri ülevaatamist, uute funktsioonide arendamist ja olemasolevate süsteemide integreerimist.",
+    "procurer": "Riigi Infosüsteemi Amet",
+    "estimated_value": 250000,
+    "deadline": "2025-10-15",
+    "category": "Technology & IT",
+    "url": "https://riigihanked.riik.ee/rhr-web/#/procurement/9262944/general-info",
+    "requirements": [
+      "Vähemalt 5 aastat kogemust avaliku sektori IT projektides",
+      "ISO 27001 sertifikaat",
+      "GDPR vastavus",
+      "Eesti keele oskus"
+    ],
+    "documents": [
+      {
+        "name": "Tehnilised nõuded",
+        "type": "docx",
+        "url": "https://riigihanked.riik.ee/rhr-web/#/procurement/9262944/documents?group=B"
+      },
+      {
+        "name": "Hinnapakkumise vorm",
+        "type": "xlsx",
+        "url": "https://riigihanked.riik.ee/rhr-web/#/procurement/9262944/documents?group=B"
+      }
+    ]
+  },
+  {
+    "id": "9262945",
+    "title": "Haigla meditsiiniseadmete hange",
+    "description": "Tallinna Lastehaigla vajab uusi meditsiiniseadmeid lasteosakonna moderniseerimiseks. Hange hõlmab ultraheli aparaate, monitore ja muid diagnostikaseadmeid.",
+    "procurer": "Tallinna Lastehaigla",
+    "estimated_value": 180000,
+    "deadline": "2025-11-20",
+    "category": "Healthcare & Medical",
+    "url": "https://riigihanked.riik.ee/rhr-web/#/procurement/9262945/general-info",
+    "requirements": [
+      "CE märgistus",
+      "Vähemalt 2 aastat garantiid",
+      "Koolituse pakkumine",
+      "24/7 tehnilise toe olemasolu"
+    ],
+    "documents": [
+      {
+        "name": "Seadmete spetsifikatsioonid",
+        "type": "pdf",
+        "url": "https://riigihanked.riik.ee/rhr-web/#/procurement/9262945/documents?group=B"
+      }
+    ]
+  },
+  {
+    "id": "9262946",
+    "title": "Kooli renoveerimistööd",
+    "description": "Tartu Ülikooli Narva kolledž vajab õppehoonete renoveerimist. Tööd hõlmavad katuse remonti, akende vahetamist ja küttesüsteemi moderniseerimist.",
+    "procurer": "Tartu Ülikool",
+    "estimated_value": 450000,
+    "deadline": "2025-09-30",
+    "category": "Construction & Infrastructure",
+    "url": "https://riigihanked.riik.ee/rhr-web/#/procurement/9262946/general-info",
+    "requirements": [
+      "Ehituslitsents",
+      "Vähemalt 10 aastat kogemust",
+      "Keskkonnakaitse nõuete täitmine",
+      "Kvaliteedi tagamise süsteem"
+    ],
+    "documents": [
+      {
+        "name": "Ehitusprojekt",
+        "type": "pdf",
+        "url": "https://riigihanked.riik.ee/rhr-web/#/procurement/9262946/documents?group=B"
+      },
+      {
+        "name": "Pakkumise vorm",
+        "type": "docx",
+        "url": "https://riigihanked.riik.ee/rhr-web/#/procurement/9262946/documents?group=B"
+      }
+    ]
+  }
+]
+
