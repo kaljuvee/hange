@@ -12,9 +12,87 @@ import json
 import re
 from bs4 import BeautifulSoup
 from enhanced_document_processor import EnhancedDocumentProcessor
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text, Float
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.dialects.sqlite import insert
 
 # Load environment variables
 load_dotenv()
+
+# Database setup
+DATABASE_URL = "sqlite:///./procurement_data.db"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+# Database model
+class Procurement(Base):
+    __tablename__ = "procurements"
+    
+    id = Column(String, primary_key=True)
+    title = Column(Text)
+    description = Column(Text)
+    clean_description = Column(Text)
+    link = Column(String)
+    published = Column(DateTime)
+    category = Column(String)
+    estimated_value = Column(Float)
+    procurer = Column(String)
+    county = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+# Create tables
+Base.metadata.create_all(bind=engine)
+
+# Estonian counties mapping
+ESTONIAN_COUNTIES = {
+    'Harjumaa': ['Tallinn', 'Keila', 'Saue', 'Maardu', 'Paldiski', 'Loksa', 'Kehra', 'Saku', 'Jüri', 'Viimsi', 'Rae', 'Kiili'],
+    'Tartumaa': ['Tartu', 'Elva', 'Kallaste', 'Võru', 'Otepää', 'Tõrva', 'Põlva', 'Räpina'],
+    'Ida-Virumaa': ['Narva', 'Kohtla-Järve', 'Sillamäe', 'Jõhvi', 'Kiviõli', 'Tapa'],
+    'Pärnumaa': ['Pärnu', 'Viljandi', 'Kilingi-Nõmme', 'Sindi', 'Tori'],
+    'Lääne-Virumaa': ['Rakvere', 'Tamsalu', 'Kunda', 'Väike-Maarja'],
+    'Järvamaa': ['Paide', 'Türi', 'Koigi'],
+    'Viljandimaa': ['Viljandi', 'Suure-Jaani', 'Mõisaküla', 'Abja-Paluoja'],
+    'Raplamaa': ['Rapla', 'Kohila', 'Märjamaa'],
+    'Võrumaa': ['Võru', 'Antsla'],
+    'Valgamaa': ['Valga', 'Tõrva', 'Otepää'],
+    'Põlvamaa': ['Põlva', 'Räpina'],
+    'Jõgevamaa': ['Jõgeva', 'Mustvee'],
+    'Läänemaa': ['Haapsalu', 'Lihula'],
+    'Saaremaa': ['Kuressaare', 'Orissaare'],
+    'Hiiumaa': ['Kärdla']
+}
+
+def map_to_county(procurer_text):
+    """Map procurer location to Estonian county"""
+    if not procurer_text:
+        return 'Unknown'
+    
+    procurer_lower = procurer_text.lower()
+    
+    # Direct county name matches
+    for county in ESTONIAN_COUNTIES.keys():
+        if county.lower().replace('maa', '') in procurer_lower:
+            return county
+    
+    # City/location matches
+    for county, cities in ESTONIAN_COUNTIES.items():
+        for city in cities:
+            if city.lower() in procurer_lower:
+                return county
+    
+    # Special cases for common abbreviations
+    if any(word in procurer_lower for word in ['tallinn', 'harju']):
+        return 'Harjumaa'
+    elif any(word in procurer_lower for word in ['tartu']):
+        return 'Tartumaa'
+    elif any(word in procurer_lower for word in ['narva', 'ida-viru']):
+        return 'Ida-Virumaa'
+    elif any(word in procurer_lower for word in ['pärnu']):
+        return 'Pärnumaa'
+    
+    return 'Other'
 client = OpenAI()
 client.api_key = os.getenv('OPENAI_API_KEY')
 OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4.1-mini')
@@ -223,34 +301,81 @@ def load_procurement_data():
         feed = feedparser.parse('https://riigihanked.riik.ee/rhr/api/public/v1/rss')
         
         procurements = []
-        for entry in feed.entries:
-            # Parse date
-            pub_date = parse_date(entry.published)
+        session = SessionLocal()
+        
+        try:
+            for entry in feed.entries:
+                # Parse date
+                pub_date = parse_date(entry.published)
+                
+                # Extract value with improved parsing
+                estimated_value = extract_value(entry.description)
+                
+                # Classify procurement with improved categorization
+                category = classify_procurement(entry.title, entry.description)
+                
+                # Parse description properly
+                clean_description = parse_description(entry.description)
+                
+                # Extract procurement ID
+                procurement_id = extract_procurement_id(entry.link)
+                
+                # Extract procurer and map to county
+                procurer = entry.get('author', 'Unknown')
+                county = map_to_county(procurer)
+                
+                procurement_data = {
+                    'title': entry.title,
+                    'description': entry.description,  # Keep original for processing
+                    'clean_description': clean_description,  # Clean version for display
+                    'link': entry.link,
+                    'published': pub_date,
+                    'category': category,
+                    'estimated_value': estimated_value,
+                    'procurer': procurer,
+                    'county': county,
+                    'id': procurement_id
+                }
+                
+                # Store in database using upsert
+                try:
+                    stmt = insert(Procurement).values(
+                        id=procurement_id,
+                        title=entry.title,
+                        description=entry.description,
+                        clean_description=clean_description,
+                        link=entry.link,
+                        published=pub_date,
+                        category=category,
+                        estimated_value=estimated_value,
+                        procurer=procurer,
+                        county=county
+                    )
+                    stmt = stmt.on_conflict_do_update(
+                        index_elements=['id'],
+                        set_=dict(
+                            title=stmt.excluded.title,
+                            description=stmt.excluded.description,
+                            clean_description=stmt.excluded.clean_description,
+                            category=stmt.excluded.category,
+                            estimated_value=stmt.excluded.estimated_value,
+                            procurer=stmt.excluded.procurer,
+                            county=stmt.excluded.county
+                        )
+                    )
+                    session.execute(stmt)
+                except Exception as db_error:
+                    print(f"Database error for procurement {procurement_id}: {db_error}")
+                
+                procurements.append(procurement_data)
             
-            # Extract value with improved parsing
-            estimated_value = extract_value(entry.description)
+            session.commit()
             
-            # Classify procurement with improved categorization
-            category = classify_procurement(entry.title, entry.description)
-            
-            # Parse description properly
-            clean_description = parse_description(entry.description)
-            
-            # Extract procurement ID
-            procurement_id = extract_procurement_id(entry.link)
-            
-            procurement = {
-                'title': entry.title,
-                'description': entry.description,  # Keep original for processing
-                'clean_description': clean_description,  # Clean version for display
-                'link': entry.link,
-                'published': pub_date,
-                'category': category,
-                'estimated_value': estimated_value,
-                'procurer': entry.get('author', 'Unknown'),
-                'id': procurement_id
-            }
-            procurements.append(procurement)
+        except Exception as e:
+            session.rollback()
+            print(f"Error processing feed: {e}")
+        finally:
+            session.close()
         
         return pd.DataFrame(procurements)
     
@@ -363,52 +488,29 @@ def main():
             st.plotly_chart(fig_pie, use_container_width=True)
     
     with col2:
-        st.subheader("💰 Value Distribution")
-        if not df.empty and df['estimated_value'].notna().any():
-            value_df = df[df['estimated_value'].notna()].copy()
-            
-            # Create value ranges for better granularity
-            def categorize_value(value):
-                if value < 1000:
-                    return "< €1K"
-                elif value < 5000:
-                    return "€1K - €5K"
-                elif value < 25000:
-                    return "€5K - €25K"
-                elif value < 100000:
-                    return "€25K - €100K"
-                elif value < 500000:
-                    return "€100K - €500K"
-                elif value < 1000000:
-                    return "€500K - €1M"
-                else:
-                    return "> €1M"
-            
-            value_df['value_range'] = value_df['estimated_value'].apply(categorize_value)
-            value_counts = value_df['value_range'].value_counts()
-            
-            # Order the ranges properly
-            range_order = ["< €1K", "€1K - €5K", "€5K - €25K", "€25K - €100K", 
-                          "€100K - €500K", "€500K - €1M", "> €1M"]
-            value_counts = value_counts.reindex([r for r in range_order if r in value_counts.index])
-            
-            fig_bar = px.bar(
-                x=value_counts.index,
-                y=value_counts.values,
-                title="Value Distribution by Range",
-                color=value_counts.values,
-                color_continuous_scale='Blues'
-            )
-            fig_bar.update_layout(
-                xaxis_title="Value Range",
-                yaxis_title="Number of Procurements",
-                height=400,
-                showlegend=False
-            )
-            fig_bar.update_xaxis(tickangle=45)
-            st.plotly_chart(fig_bar, use_container_width=True)
+        st.subheader("🗺️ Distribution by County")
+        if not df.empty:
+            county_counts = df['county'].value_counts()
+            if not county_counts.empty:
+                fig_county = px.bar(
+                    x=county_counts.index,
+                    y=county_counts.values,
+                    title="Procurements by Estonian County",
+                    color=county_counts.values,
+                    color_continuous_scale='Viridis'
+                )
+                fig_county.update_layout(
+                    xaxis_title="County",
+                    yaxis_title="Number of Procurements",
+                    height=400,
+                    showlegend=False
+                )
+                fig_county.update_xaxis(tickangle=45)
+                st.plotly_chart(fig_county, use_container_width=True)
+            else:
+                st.info("County data is being processed...")
         else:
-            st.info("No value data available for visualization")
+            st.info("No county data available")
     
     st.markdown("---")
     
