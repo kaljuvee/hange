@@ -11,3 +11,6 @@ openpyxl
 fpdf2
 lxml
 sqlalchemy
+langgraph
+langchain
+langchain-openai

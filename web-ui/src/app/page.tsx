@@ -17,7 +17,6 @@ import {
 
 export default function Home() {
   const [language, setLanguage] = useState<'et' | 'en'>('et')
-  const [email, setEmail] = useState('')
 
   const content = {
     et: {
@@ -176,12 +175,6 @@ export default function Home() {
 
   const t = content[language]
 
-  const handleSignup = () => {
-    if (email) {
-      window.open(`https://hange-ai.streamlit.app/?email=${encodeURIComponent(email)}`, '_blank')
-    }
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Header */}
@@ -275,16 +268,9 @@ export default function Home() {
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-10 border border-blue-100 shadow-xl max-w-2xl mx-auto">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">{t.cta.title}</h3>
             <p className="text-gray-600 mb-8 text-lg">{t.cta.subtitle}</p>
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
-              <input
-                type="email"
-                placeholder={t.cta.placeholder}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-6 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-              />
+            <div className="flex flex-col sm:flex-row gap-4 mb-6 justify-center">
               <button
-                onClick={handleSignup}
+                onClick={() => window.open('https://hange.onrender.com/', '_blank')}
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center space-x-2 font-semibold text-lg shadow-lg hover:shadow-xl"
               >
                 <span>{t.cta.button}</span>
