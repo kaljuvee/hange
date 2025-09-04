@@ -429,7 +429,7 @@ def render_fetch_documents():
     col1, col2 = st.columns(2)
     
     with col1:
-        procurement_id = st.text_input("Procurement ID:", placeholder="e.g., 9262944")
+        procurement_id = st.text_input("Procurement ID:", placeholder="e.g., 299839")
     
     with col2:
         st.write("")  # Spacing
@@ -447,20 +447,28 @@ def render_fetch_documents():
             
             st.success(f"Found {len(sample_docs)} documents for procurement {procurement_id}")
             
-            # Display documents with fetch buttons
-            for doc_name in sample_docs:
-                col1, col2, col3 = st.columns([3, 1, 1])
-                
-                with col1:
-                    st.write(f"📄 {doc_name}")
-                
-                with col2:
-                    doc_type = "DOCX" if "Contract" in doc_name or "Specification" in doc_name else "PDF"
-                    st.write(doc_type)
-                
-                with col3:
-                    if st.button("📥 Process", key=f"fetch_{doc_name}"):
-                        process_document(procurement_id, doc_name, "fetch")
+            # Display documents with process buttons
+            st.markdown("### 📋 Available Documents")
+            
+            for i, doc_name in enumerate(sample_docs):
+                with st.container():
+                    col1, col2, col3 = st.columns([4, 1, 1])
+                    
+                    with col1:
+                        st.write(f"📄 **{doc_name}**")
+                    
+                    with col2:
+                        doc_type = "DOCX" if "Contract" in doc_name or "Specification" in doc_name else "PDF"
+                        st.markdown(f"<span style='background-color: #f0f2f6; padding: 2px 8px; border-radius: 12px; font-size: 12px;'>{doc_type}</span>", unsafe_allow_html=True)
+                    
+                    with col3:
+                        if st.button("🔄 Process", key=f"fetch_{doc_name}_{i}", type="secondary"):
+                            process_document(procurement_id, doc_name, "fetch")
+                    
+                    st.divider()
+    
+    elif fetch_button and not procurement_id:
+        st.error("⚠️ Please enter a Procurement ID")
 
 def render_upload_documents():
     st.subheader("📤 Upload Document for Processing")
@@ -510,49 +518,72 @@ def process_document(procurement_id, document_name, source_type):
     st.markdown("---")
     st.subheader(f"🔍 Processing: {document_name}")
     
-    with st.spinner("Analyzing document with AI..."):
-        if source_type == "sample" or source_type == "fetch":
-            # Get sample document content
-            doc_data = simulate_document_fetch(procurement_id, document_name)
-            document_content = doc_data['content']
-            document_type = doc_data['type']
-        else:
-            st.error("Unsupported source type")
-            return
-        
-        # Extract fields using OpenAI
-        extracted_fields = extract_document_fields_with_openai(document_content, document_type)
-        
-        if extracted_fields:
-            st.success("✅ Document analysis completed!")
-            
-            # Display extraction results
-            display_extraction_results(extracted_fields)
-            
-            # Create web form
-            form_data = create_web_form(extracted_fields)
-            
-            if form_data:
-                st.success("Form data saved!")
+    try:
+        with st.spinner("Analyzing document with AI..."):
+            if source_type == "sample" or source_type == "fetch":
+                # Get sample document content
+                doc_data = simulate_document_fetch(procurement_id, document_name)
+                document_content = doc_data['content']
+                document_type = doc_data['type']
                 
-                # Generate PDF option
-                if st.button("📄 Generate PDF", type="primary"):
-                    pdf_path = generate_pdf_from_form_data(form_data, extracted_fields)
+                st.info(f"📄 Document Type: {document_type.upper()}")
+                
+                # Show content preview
+                with st.expander("📖 Document Content Preview"):
+                    st.text_area("Content", document_content[:1000] + "..." if len(document_content) > 1000 else document_content, height=200, disabled=True)
+                
+            else:
+                st.error("❌ Unsupported source type")
+                return
+            
+            # Extract fields using OpenAI
+            st.info("🤖 Analyzing document with OpenAI...")
+            extracted_fields = extract_document_fields_with_openai(document_content, document_type)
+            
+            if extracted_fields:
+                st.success("✅ Document analysis completed successfully!")
+                
+                # Display extraction results
+                display_extraction_results(extracted_fields)
+                
+                # Create web form
+                form_data = create_web_form(extracted_fields)
+                
+                if form_data:
+                    st.success("💾 Form data saved successfully!")
                     
-                    if pdf_path:
-                        with open(pdf_path, "rb") as pdf_file:
-                            pdf_bytes = pdf_file.read()
-                        
-                        st.download_button(
-                            label="💾 Download Filled Form PDF",
-                            data=pdf_bytes,
-                            file_name=f"{document_name.replace(' ', '_')}_filled.pdf",
-                            mime="application/pdf"
-                        )
-                        
-                        st.success("PDF generated successfully!")
-        else:
-            st.error("Failed to extract fields from document")
+                    # Generate PDF option
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if st.button("📄 Generate PDF", type="primary", key=f"pdf_{document_name}"):
+                            with st.spinner("Generating PDF..."):
+                                pdf_path = generate_pdf_from_form_data(form_data, extracted_fields)
+                                
+                                if pdf_path:
+                                    with open(pdf_path, "rb") as pdf_file:
+                                        pdf_bytes = pdf_file.read()
+                                    
+                                    st.download_button(
+                                        label="💾 Download Filled Form PDF",
+                                        data=pdf_bytes,
+                                        file_name=f"{document_name.replace(' ', '_')}_filled.pdf",
+                                        mime="application/pdf",
+                                        key=f"download_{document_name}"
+                                    )
+                                    
+                                    st.success("📄 PDF generated successfully!")
+                                else:
+                                    st.error("❌ Failed to generate PDF")
+                    
+                    with col2:
+                        if st.button("🔄 Process Another Document", type="secondary", key=f"another_{document_name}"):
+                            st.rerun()
+            else:
+                st.error("❌ Failed to extract fields from document. Please try again or contact support.")
+                
+    except Exception as e:
+        st.error(f"❌ An error occurred while processing the document: {str(e)}")
+        st.info("💡 Please try again or contact support if the issue persists.")
 
 def process_uploaded_document(file_path, filename):
     """Process an uploaded document"""
