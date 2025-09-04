@@ -1,18 +1,15 @@
 import streamlit as st
-import feedparser
 import pandas as pd
-from datetime import datetime
-from openai import OpenAI
-import os
-from dotenv import load_dotenv
 import plotly.express as px
 import plotly.graph_objects as go
-import sqlite3
-import json
+import feedparser
 import re
+from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
-from enhanced_document_processor import EnhancedDocumentProcessor
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text, Float
+import os
+from dotenv import load_dotenv
+import openai
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, Float, insert
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.sqlite import insert
@@ -297,6 +294,12 @@ def extract_procurement_id(link):
 @st.cache_data(ttl=300)  # Cache for 5 minutes
 def load_procurement_data():
     try:
+        # Check if data exists in session state and is recent
+        if 'procurement_data' in st.session_state and 'last_update' in st.session_state:
+            last_update = st.session_state['last_update']
+            if datetime.now() - last_update < timedelta(minutes=5):
+                return st.session_state['procurement_data']
+        
         # Load RSS feed
         feed = feedparser.parse('https://riigihanked.riik.ee/rhr/api/public/v1/rss')
         
@@ -377,10 +380,20 @@ def load_procurement_data():
         finally:
             session.close()
         
-        return pd.DataFrame(procurements)
+        # Create DataFrame
+        df = pd.DataFrame(procurements)
+        
+        # Store in session state with timestamp
+        st.session_state['procurement_data'] = df
+        st.session_state['last_update'] = datetime.now()
+        
+        return df
     
     except Exception as e:
         st.error(f"Error loading procurement data: {str(e)}")
+        # Return cached data if available, otherwise empty DataFrame
+        if 'procurement_data' in st.session_state:
+            return st.session_state['procurement_data']
         return pd.DataFrame()
 
 # Function to get procurement statistics
@@ -503,9 +516,9 @@ def main():
                     xaxis_title="County",
                     yaxis_title="Number of Procurements",
                     height=400,
-                    showlegend=False
+                    showlegend=False,
+                    xaxis={'tickangle': 45}
                 )
-                fig_county.update_xaxis(tickangle=45)
                 st.plotly_chart(fig_county, use_container_width=True)
             else:
                 st.info("County data is being processed...")
