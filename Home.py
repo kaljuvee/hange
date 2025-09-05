@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 import os
 from dotenv import load_dotenv
-from openai import OpenAI
+from langchain_openai import ChatOpenAI
 from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, Float, insert
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -90,9 +90,11 @@ def map_to_county(procurer_text):
         return 'Pärnumaa'
     
     return 'Other'
-client = OpenAI()
-client.api_key = os.getenv('OPENAI_API_KEY')
-OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4.1-mini')
+llm = ChatOpenAI(
+    model=os.getenv('OPENAI_MODEL', 'gpt-4o-mini'),
+    api_key=os.getenv('OPENAI_API_KEY'),
+    temperature=0.1
+)
 
 # Set page config
 st.set_page_config(
@@ -157,19 +159,13 @@ def parse_date(date_str):
         except:
             return None
 
-# Function to translate text using OpenAI
+# Function to translate text using LangChain OpenAI
 @st.cache_data(ttl=3600)  # Cache for 1 hour
 def translate_text(text):
     try:
-        response = client.chat.completions.create(
-            model=OPENAI_MODEL,
-            messages=[
-                {"role": "system", "content": "You are a translator. Translate the following Estonian text to English. Keep it concise and professional."},
-                {"role": "user", "content": text[:1000]}  # Limit text length
-            ],
-            temperature=0.1
-        )
-        return response.choices[0].message.content
+        prompt = f"You are a translator. Translate the following Estonian text to English. Keep it concise and professional.\n\n{text[:1000]}"
+        response = llm.invoke(prompt)
+        return response.content
     except Exception as e:
         return f"Translation error: {str(e)}"
 
@@ -203,16 +199,11 @@ def classify_procurement(title, description):
         Based on the Estonian text, return ONLY the category name (e.g., "Construction & Infrastructure").
         """
         
-        response = client.chat.completions.create(
-            model=OPENAI_MODEL,
-            messages=[
-                {"role": "system", "content": "You are an expert in Estonian procurement classification. Analyze the text carefully and return only the most appropriate category name."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.1
-        )
+        response = llm.invoke(f"""You are an expert in Estonian procurement classification. Analyze the text carefully and return only the most appropriate category name.
+
+{prompt}""")
         
-        category = response.choices[0].message.content.strip()
+        category = response.content.strip()
         
         # Validate category
         valid_categories = [

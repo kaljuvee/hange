@@ -2,7 +2,6 @@ streamlit
 feedparser
 pandas
 python-dotenv
-openai
 plotly
 beautifulsoup4
 requests
