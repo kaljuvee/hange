@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 import os
 from dotenv import load_dotenv
-import openai
+from openai import OpenAI
 from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, Float, insert
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
